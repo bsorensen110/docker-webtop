@@ -250,6 +250,40 @@ services:
               capabilities: [compute,video,graphics,utility]
 ```
 
+### AV1 Hardware Encoding Support
+
+This container now includes support for AV1 video encoding, which provides better compression efficiency than H.264 at similar quality levels. AV1 encoding is available through the following methods:
+
+#### Software AV1 Encoding
+
+The container includes the `rav1e` encoder for CPU-based AV1 encoding. To use AV1 encoding:
+
+```bash
+-e SELKIES_ENCODER="rav1enc"
+```
+
+#### Hardware AV1 Encoding (Intel/AMD)
+
+For systems with compatible GPUs that support AV1 hardware encoding via VA-API:
+
+1. Mount the GPU device:
+   ```bash
+   --device /dev/dri:/dev/dri
+   ```
+
+2. Set the encoder to use VA-API with AV1:
+   ```bash
+   -e SELKIES_ENCODER="vaapih264enc"
+   -e DRI_NODE="/dev/dri/renderD128"
+   ```
+
+**Note**: AV1 hardware encoding support depends on your GPU's capabilities. Modern Intel Arc GPUs and recent AMD GPUs include AV1 encoding support. Check your hardware specifications for AV1 encode support.
+
+To verify available VA-API encoders in your container:
+```bash
+docker exec -it <container_name> vainfo
+```
+
 ### Application Management
 
 There are two methods for installing applications inside the container: PRoot Apps (recommended for persistence) and Native Apps.
@@ -368,7 +402,7 @@ The server can be forced to use a single, fixed resolution for all connecting cl
 | `SELKIES_CLIPBOARD_ENABLED` | `True` | Enable clipboard synchronization. |
 | `SELKIES_COMMAND_ENABLED` | `True` | Enable parsing of command websocket messages. |
 | `SELKIES_FILE_TRANSFERS` | `'upload,download'` | Allowed file transfer directions (comma-separated: "upload,download"). Set to "" or "none" to disable. |
-| `SELKIES_ENCODER` | `'x264enc,x264enc-striped,jpeg'` | The default video encoders. |
+| `SELKIES_ENCODER` | `'x264enc,x264enc-striped,jpeg'` | The default video encoders. Supports H.264 (`x264enc`, `x264enc-striped`), AV1 (`rav1enc` for software or `vaapih264enc` for hardware when available), and JPEG. |
 | `SELKIES_FRAMERATE` | `'8-120'` | Allowed framerate range or a fixed value. |
 | `SELKIES_H264_CRF` | `'5-50'` | Allowed H.264 CRF range or a fixed value. |
 | `SELKIES_JPEG_QUALITY` | `'1-100'` | Allowed JPEG quality range or a fixed value. |

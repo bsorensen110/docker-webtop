@@ -22,6 +22,8 @@ RUN \
     adw-gtk3 \
     adwaita-xfce-icon-theme \
     chromium \
+    gst-plugins-rs-rav1e \
+    gst-vaapi \
     mousepad \
     ristretto \
     thunar \
